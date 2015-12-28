@@ -1,8 +1,43 @@
+/**
+* @module TabeIterator
+*/
 (function(exports){
-  
+/**
+*
+* A factory for creating table Iterators.
+* A table iterator enables iteration over the table metadata exposed by a JDBC connection.
+* (see: see: java.sql.DatabaseMetaData#getTables))
+*
+* In addition to just enabling iteration over the tables, the table iterator also has 
+* methods to retrieve and iterate over related metadata, such as 
+* columns, primary key columns, imported key columns (foreign key columns), 
+* exported key columns (foreign key columns that refer to the current table), and
+* index columns.
+*
+* For an example of how to use the TabeIteratorFactory, checkout the TableIteratorSample.
+*
+* @class TabeIteratorFactory
+* @static
+* @requires jdbc
+* @requires resultsetIterator
+*/
+
   return define(
     "jdbc.js", "iterateResultset.js", 
     function(jdbc, iterateResultset){
+      
+      /**
+      *
+      * Takes connection properties to establish a jdbc connection, 
+      * and applies the specified filter to obtain (a subset of) its table metdata.
+      * Finally, it creates an ResultsetIterator for the table metadata, 
+      * which uses the specified callbacks.
+      *
+      * @method createTableIterator
+      * @param {JDBCConnectionProperties} connectionProperties
+      * @param {object} filter
+      * @param {TableIteratorCallbacks} callbacks
+      */
       function createTableIterator(connectionProperties, filter, callbacks){
         var connection;
         var connectionPropertiesType = typeof(connectionProperties);
@@ -54,32 +89,80 @@
         }
         
         var me = callbacks;
+        /**
+        *
+        * The TableIteratorCallbacks class is a {{#crosslink "ResultsetIterator"}}{{/crossLink}}.
+        * The caller can provide all the usual hooks for a plain {{#crosslink "ResultsetIterator"}}{{/crossLink}}, 
+        * and then pass it to the {{#crosslink "TabeIteratorFactory/createTableIterator:method"}} method.
+        *
+        * @class TableIteratorCallbacks
+        * @extends ResultsetIteratorCallbacks
+        */
         var methods = {
+          /**
+          * Do the iteration over the tables associated with the connection and the passed filter properties.
+          *
+          * @method iterate
+          */
           iterate: function(){
             var output = iterateResultset(tables, me);
             closeConnection();
             return output;
           },
+          /**
+          * Retrieves the columns associated with the table that is currently considered in the iteration, 
+          * and iterates through those.
+          *
+          * @method iterateColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of columns.
+          */
           iterateColumns: function(callbacks){
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getColumns(args.catalog, args.schema, args.table, "%");
             return iterateResultset(resultset, callbacks);
           },
+          /**
+          * Retrieves the primary key columns associated with the table that is currently considered in the iteration, 
+          * and iterates through those.
+          *
+          * @method iteratePrimaryKeyColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of primary key columns.
+          */
           iteratePrimaryKeyColumns: function(callbacks){
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getPrimaryKeys(args.catalog, args.schema, args.table);
             return iterateResultset(resultset, callbacks);
           },
+          /**
+          * Retrieves the imported key columns (i.e. those columns on which a foreign key is defined) associated with the table that is currently considered in the iteration, 
+          * and iterates through those.
+          *
+          * @method iteratePrimaryKeyColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of imported key columns.
+          */
           iterateImportedKeyColumns: function(callbacks){
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getImportedKeys(args.catalog, args.schema, args.table);
             return iterateResultset(resultset, callbacks);
           },
+          /**
+          * Retrieves the exported key columns (i.e. those columns from this table that are referenced by foreign keys in other tables) associated 
+          * with the table that is currently considered in the iteration, and iterates through those.
+          *
+          * @method iterateImportedKeyColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of imported key columns.
+          */
           iterateExportedKeyColumns: function(callbacks){
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getExportedKeys.apply(metadata, args);
             return iterateResultset(resultset, callbacks);
           },
+          /**
+          * Retrieves the index columns associated with the table that is currently considered in the iteration, and iterates through those.
+          *
+          * @method iterateIndexColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of index columns.
+          */
           iterateIndexColumns: function(callbacks, unique, approximate){
             var args = getCatalogSchemaTable.call(me);
             unique = unique || false;

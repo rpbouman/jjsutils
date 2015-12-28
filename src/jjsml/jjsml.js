@@ -21,6 +21,7 @@
 * The global object.
 *
 * @class Global
+* @static
 */
   //prevent overriding this script's assets.
   if (exports.define) {

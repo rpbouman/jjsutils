@@ -6,7 +6,8 @@
   <property name="java-src" location="java"/>
   <property name="build" location="build"/>
   <property name="dist" location="dist"/>
-  <property name="tmp" location="tmp"/>
+  <property name="doc" location="doc"/>
+  <property name="src" location="src"/>
 
   <target name="init">
     <!-- Create the time stamp -->
@@ -23,13 +24,22 @@
 
   <target name="jar" depends="compile" description="generate the jar">
     <!-- Create the distribution directory -->
+    <delete dir="lib"/>
     <mkdir dir="lib"/>
 
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
     <jar jarfile="lib/${ant.project.name}-${DSTAMP}.jar" basedir="${build}"/>
   </target>
+    
+  <target name="doc" >
+    <exec executable="cmd">
+      <arg value="yuidoc"/>
+      <arg value="doc"/>
+      <arg value="src"/>
+    </exec>
+  </target>
   
-  <target name="dist" depends="jar" description="generate binary distribution pacakge">
+  <target name="dist" depends="jar,doc" description="generate binary distribution pacakge">
     <zip destfile="${dist}/${ant.project.name}.zip">
       <fileset dir="." includes="doc/**"/>
       <fileset dir="." includes="examples/**"/>

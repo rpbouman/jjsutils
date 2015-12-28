@@ -1,8 +1,22 @@
 (function(exports){
-  
+
+/**
+* This is a sample to illustrate how you can use the TableIteratorFactory.
+* The TableIteratorSample can be run as a command line program, like so:
+*
+*     jjs -scripting -Djjsml.main.module=src/jdbc/TableIteratorSample.js src/jjsml/jjsml.js
+*
+* The script takes command line arguments to specify a JDBC connection, 
+* and will then print out tables, columns, primary keys etc. info.
+*
+* You can use this script as a basis to create scripts that generate DDL or so.
+*
+* @class TableIteratorSample
+* @static
+*/  
   return define(
     "../args/Args.js", 
-    "createTableIterator.js",     
+    "TableIteratorFactory.js",     
     function(args, createTableIterator){
       args.define({
         name: "driver",
