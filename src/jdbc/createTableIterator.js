@@ -23,7 +23,7 @@
 */
 
   return define(
-    "jdbc.js", "iterateResultset.js", 
+    "Jdbc.js", "iterateResultset.js", 
     function(jdbc, iterateResultset){
       
       /**
@@ -43,10 +43,10 @@
         var connectionPropertiesType = typeof(connectionProperties);
         switch (connectionPropertiesType) {
           case "string":
-            connection = jdbc.get(connectionProperties);
+            connection = jdbc.getConnection(connectionProperties);
             break;
           case "object":
-            connection = jdbc.open(connectionProperties);
+            connection = jdbc.openConnection(connectionProperties);
             break;
           default:
             throw new Error("Connectionproperties must be either a connection name or a object specifying connection properties.");
@@ -117,6 +117,7 @@
           * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of columns.
           */
           iterateColumns: function(callbacks){
+            callbacks.tableIterator = me;
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getColumns(args.catalog, args.schema, args.table, "%");
             return iterateResultset(resultset, callbacks);
@@ -129,6 +130,7 @@
           * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of primary key columns.
           */
           iteratePrimaryKeyColumns: function(callbacks){
+            callbacks.tableIterator = me;
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getPrimaryKeys(args.catalog, args.schema, args.table);
             return iterateResultset(resultset, callbacks);
@@ -141,6 +143,7 @@
           * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of imported key columns.
           */
           iterateImportedKeyColumns: function(callbacks){
+            callbacks.tableIterator = me;
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getImportedKeys(args.catalog, args.schema, args.table);
             return iterateResultset(resultset, callbacks);
@@ -153,6 +156,7 @@
           * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of imported key columns.
           */
           iterateExportedKeyColumns: function(callbacks){
+            callbacks.tableIterator = me;
             var args = getCatalogSchemaTable.call(me);
             var resultset = metadata.getExportedKeys.apply(metadata, args);
             return iterateResultset(resultset, callbacks);
@@ -164,6 +168,7 @@
           * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of index columns.
           */
           iterateIndexColumns: function(callbacks, unique, approximate){
+            callbacks.tableIterator = me;
             var args = getCatalogSchemaTable.call(me);
             unique = unique || false;
             approximate = approximate || true;

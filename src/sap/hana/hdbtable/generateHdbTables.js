@@ -72,7 +72,8 @@
             "n": false
           };
           value = values[value.toLowerCase()];
-          return Boolean(value);
+          value = Boolean(value);
+          return value;
         }
       }, {
         name: "directory",
@@ -241,10 +242,11 @@ EOD
             }
           }
           if (file !== null) {
-            var PrintStream = Java.type("java.io.PrintStream");
-            var printStream = new PrintStream(file);
             var verb = file.exists() ? "Overwriting existing" : "Writing new";
             print(verb + " file " + canonicalPath);
+
+            var PrintStream = Java.type("java.io.PrintStream");
+            var printStream = new PrintStream(file);
             printStream.print(output);
           }
         },

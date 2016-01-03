@@ -149,7 +149,7 @@
     getColumns.call(callbacks);
 
     function getRow(){
-      var name, columns = this.columns, row = this.row;
+      var name, columns = this.columns, row = {};
       for (name in columns) {
         try {
           row[name] = resultSet.getObject(name);
@@ -158,6 +158,7 @@
           print(resultSet);
         }
       }
+      this.row = row;
     }
 
     var output, allOutput = "";
@@ -173,6 +174,7 @@
     }
     
     while (resultSet.next()) {
+      getRow.call(callbacks);
       if (callbacks.rowNum === 0) {
         /**
         * The beforeFirst callback is called right before the first row is iterated.
@@ -185,7 +187,6 @@
         }
       }
 
-      getRow.call(callbacks);
       callbacks.rowNum++;
       
       /**

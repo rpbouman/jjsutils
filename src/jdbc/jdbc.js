@@ -134,7 +134,7 @@
       default: 
         throw new Error("Configuration must either be a driverName or an object with a driver key, and optionally a jar key.");
     }
-    
+
     if (jar) {
       var DriverDelegate = Java.type("org.jjsutils.jdbc.DriverDelegate");
       var driver = new DriverDelegate(driver, jar);

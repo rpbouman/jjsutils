@@ -16,7 +16,7 @@
 * arguments arg1 and arg2, then you could use the Args module like this:
 *
 *     (function(){
-*         define("../../src/args/args.js", function(args){
+*         define("../../src/args/Args.js", function(args){
 *         
 *           //1) use args.define() to pass one or more argDef objects
 *           args.define({     

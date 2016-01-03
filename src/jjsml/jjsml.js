@@ -39,10 +39,14 @@
     return path.split(/[\/\\]/g);
   }
   
+  var System = Java.type("java.lang.System");
   function getSystemProperty(name){
-    var System = Java.type("java.lang.System");
     var value = System.getProperty(name);
     return value;
+  }
+
+  function setSystemProperty(name, value){
+    System.setProperty(name, value);
   }
    
   //current working directories.
@@ -200,37 +204,48 @@
     return dependencyModule;
   }
   
+  function initMainModule(){
+    var dir, isAbsolute, script;
+    var mainModule = getSystemProperty("jjsml.main.module");
+    if (mainModule === null || typeof(mainModule) === "undefined") {
+      dir = [];
+      isAbsolute = false;
+    }
+    else {
+      //split the module in script and path
+      dir = splitPath(mainModule);
+      script = dir.pop();
+
+      //obtain a file representing the module to load
+      var file = new File(dir.join(separator), script);
+      isAbsolute = file.isAbsolute();
+    }
+    
+    
+    if (!isAbsolute) {
+      //relative: prepend the program working directory
+      var pwd = $ENV.PWD;
+      pwd = splitPath(pwd);
+      dir = pwd.concat(dir);
+    }
+    //establish initial current working directory
+    cwd.push(dir);
+    
+    //load the main module.
+    if (script) {
+      var module = getModule(script);
+      if (typeof(module) === "function") {
+        module();
+      }
+    }    
+  }
+    
   //make define() accesible in the global object
   exports.define = define;
   
   //override the built-in load
   //exports.load = plainLoad;
-  
-  var mainModule = getSystemProperty("jjsml.main.module");
-  if (mainModule === null || typeof(mainModule) === "undefined") {
-    throw new Error("Cannot load main module: System property jjsml.main.module is undefined. Pass the main module script as -Djjsml.main.module=<your main module script>");
-  }
-  
-  //split the module in script and path
-  var dir = splitPath(mainModule);
-  var script = dir.pop();
-  
-  //obtain a file representing the module to load
-  var file = new File(dir.join(separator), script);
-  var isAbsolute = file.isAbsolute();
-  if (!isAbsolute) {
-    //relative: prepend the program working directory
-    var pwd = $ENV.PWD;
-    pwd = splitPath(pwd);
-    dir = pwd.concat(dir);
-  }
-  //establis initial current working directoruy
-  cwd.push(dir);
-  
-  //load the main module.
-  var module = getModule(script);
-  if (typeof(module) === "function") {
-    module();
-  }
+
+  initMainModule();
   
 })(this);
