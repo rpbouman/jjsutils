@@ -10,7 +10,7 @@
       hanaJdbcHelper.defineArgs();
       hanaViewGeneratorHelper.defineArgs();
       args.set("tableprefix", "DIM_"); 
-      args.set("viewprefix", "AT_");      
+      args.set("viewprefix", "CAD_");      
       hanaViewGeneratorHelper.initArgs();
               
       var columnCallbacks = {
@@ -35,22 +35,22 @@
           var isKey = typeof(primaryKeyColumn) !== "undefined";
           output = <<EOD
 
-    <attribute 
-      id="${hanaViewGeneratorHelper.escapeXml(columnName)}" 
-      key="${isKey}" 
-      order="${row.ORDINAL_POSITION}" 
-      attributeHierarchyActive="false" 
-      displayAttribute="false"
-    >
-      <descriptions 
-        defaultDescription="${hanaViewGeneratorHelper.escapeXml(friendlyName)}"
-      />
-      <keyMapping 
-        schemaName="${hanaViewGeneratorHelper.escapeXml(schemaName)}" 
-        columnObjectName="${hanaViewGeneratorHelper.escapeXml(tableName)}" 
-        columnName="${hanaViewGeneratorHelper.escapeXml(columnName)}"
-      />
-    </attribute>
+      <attribute 
+        id="${hanaViewGeneratorHelper.escapeXml(columnName)}" 
+        key="${isKey}" 
+        order="${row.ORDINAL_POSITION}" 
+        attributeHierarchyActive="false" 
+        displayAttribute="false"
+      >
+        <descriptions 
+          defaultDescription="${hanaViewGeneratorHelper.escapeXml(friendlyName)}"
+        />
+        <keyMapping 
+          schemaName="${hanaViewGeneratorHelper.escapeXml(schemaName)}" 
+          columnObjectName="${hanaViewGeneratorHelper.escapeXml(tableName)}" 
+          columnName="${hanaViewGeneratorHelper.escapeXml(columnName)}"
+        />
+      </attribute>
 EOD        
           return output;
         }
@@ -65,35 +65,35 @@ EOD
           var hierarchyName = "HIER_" + objectName + "1";
           
           var output = <<EOD
-    <hierarchy 
-      xsi:type="Dimension:LeveledHierarchy" 
-      id="${hierarchyName}" 
-      aggregateAllNodes="true" 
-      rootNodeVisibility="ADD_ROOT_NODE" 
-      withRootNode="true" 
-      nodeStyle="LEVEL_NAME"
-    >
-      <descriptions defaultDescription="${hanaViewGeneratorHelper.escapeXml(hierarchyDescription)}"/>
-      <levels>
+  <inlineHierarchy 
+    xsi:type="Dimension:LeveledHierarchy" 
+    id="${hierarchyName}" 
+    aggregateAllNodes="true" 
+    rootNodeVisibility="ADD_ROOT_NODE" 
+    withRootNode="true" 
+    nodeStyle="LEVEL_NAME"
+  >
+    <descriptions defaultDescription="${hanaViewGeneratorHelper.escapeXml(hierarchyDescription)}"/>
+    <levels>
 EOD       
           return output;
         },
         forEach: function(){
           var output = <<EOD
 
-        <level 
-          levelAttribute="#${hanaViewGeneratorHelper.escapeXml(this.row.COLUMN_NAME)}" 
-          levelType="MDLEVEL_TYPE_REGULAR" 
-          order="1" 
-          orderAttribute="#${hanaViewGeneratorHelper.escapeXml(this.row.COLUMN_NAME)}"
-        />
+      <level 
+        levelAttribute="#${hanaViewGeneratorHelper.escapeXml(this.row.COLUMN_NAME)}" 
+        levelType="MDLEVEL_TYPE_REGULAR" 
+        order="1" 
+        orderAttribute="#${hanaViewGeneratorHelper.escapeXml(this.row.COLUMN_NAME)}"
+      />
 EOD          
           return output;
         },
         afterLast: function(){
           var output = <<EOD
-      </levels>
-    </hierarchy>          
+    </levels>
+  </inlineHierarchy>          
 EOD       
           return output;
         }
@@ -112,62 +112,73 @@ EOD
 
           var output = <<EOD
 <?xml version="1.0" encoding="UTF-8"?>
-<Dimension:dimension 
+<Calculation:scenario 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" 
   xmlns:Dimension="http://www.sap.com/ndb/BiModelDimension.ecore" 
-  schemaVersion="1.2" 
+  schemaVersion="2.3" 
   id="${hanaViewGeneratorHelper.escapeXml(id)}" 
   applyPrivilegeType="ANALYTIC_PRIVILEGE" 
   checkAnalyticPrivileges="true" 
   defaultClient="$$client$$" 
   defaultLanguage="$$language$$" 
   visibility="internal" 
-  dimensionType="Standard"
+  calculationScenarioType="TREE_BASED" 
+  dataCategory="DIMENSION" 
+  enforceSqlExecution="false" 
+  executionSemantic="UNDEFINED" 
+  outputViewType="Projection"
 >
   <descriptions 
     defaultDescription="${hanaViewGeneratorHelper.escapeXml(description)}"
   />
-  <attributes>
-${this.iterateColumns(columnCallbacks)}
-  </attributes>
-  <calculatedAttributes/>
-  <privateDataFoundation>
-    <tableProxies>
-      <tableProxy>
-        <table 
-          schemaName="${hanaViewGeneratorHelper.escapeXml(this.row.TABLE_SCHEM)}" 
-          columnObjectName="${hanaViewGeneratorHelper.escapeXml(tableName)}"
-        />
-      </tableProxy>
-    </tableProxies>
-    <joins/>
-    <layout>
-      <shapes>
-        <shape 
-          modelObjectName="${hanaViewGeneratorHelper.escapeXml(this.row.TABLE_NAME)}" 
-          modelObjectNameSpace="${hanaViewGeneratorHelper.escapeXml(this.row.TABLE_SCHEM)}" 
-          modelObjectType="catalog"
-        >
-          <upperLeftCorner x="70" y="30"/>
-        </shape>
-        <shape 
-          modelObjectName="DataFoundation" 
-          modelObjectNameSpace="DataFoundation" 
-          modelObjectType="repository"
-        >
-          <upperLeftCorner x="40" y="85"/>
-          <rectangleSize/>
-        </shape>
-      </shapes>
-    </layout>
-  </privateDataFoundation>
-  <hierarchies>
+  <localVariables/>
+  <variableMappings/>
+  <dataSources>
+    <DataSource 
+      id="${hanaViewGeneratorHelper.escapeXml(tableName)}" 
+      type="DATA_BASE_TABLE"
+    >
+      <viewAttributes allViewAttributes="true"/>
+      <columnObject 
+        schemaName="${hanaViewGeneratorHelper.escapeXml(this.row.TABLE_SCHEM)}" 
+        columnObjectName="${hanaViewGeneratorHelper.escapeXml(tableName)}"
+      />
+    </DataSource>
+  </dataSources>
+  <calculationViews/>
 ${this.iteratePrimaryKeyColumns(primaryKeyColumnCallbacks)}  
-  </hierarchies>
-</Dimension:dimension>          
+  <logicalModel 
+    id="${hanaViewGeneratorHelper.escapeXml(tableName)}"
+  >
+    <attributes>
+${this.iterateColumns(columnCallbacks)}
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures/>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="40" y="85"/>
+        <rectangleSize height="0" width="0"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>
 EOD          
           var viewName = hanaViewGeneratorHelper.getViewName(this.row.TABLE_NAME);
-          var fileName = viewName + ".attributeview";
+          var fileName = viewName + ".calculationview";
           hanaViewGeneratorHelper.handleOutput(output, fileName);
           return output;
         }

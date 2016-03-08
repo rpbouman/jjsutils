@@ -43,11 +43,11 @@
       function defineArgs() {
         args.define({
           name: "viewprefix",
-          help: "A prefix for your attribute view",
+          help: "A prefix for your view",
           value: "" 
         }, {
           name: "viewpostfix",
-          help: "A postfix for your attribute view",
+          help: "A postfix for your view",
           value: "_001" 
         }, {
           name: "tableprefix",
