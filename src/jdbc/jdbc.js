@@ -136,8 +136,18 @@
     }
 
     if (jar) {
-      var DriverDelegate = Java.type("org.jjsutils.jdbc.DriverDelegate");
-      var driver = new DriverDelegate(driver, jar);
+      var driverDelegateClassName = "org.jjsutils.jdbc.DriverDelegate";
+      try {
+        var DriverDelegate = Java.type(driverDelegateClassName);
+        var driver = new DriverDelegate(driver, jar);
+      }
+      catch (ex){
+        ex.printStackTrace();
+        throw new Error(
+          "Error getting Java Type " + driverDelegateClassName + ".\n\n" +
+          "Maybe you forgot to pass -J-Djava.class.path=lib/jjsutils-yyyymmdd.jar to the jjs executable?"
+        );
+      }
     }
     else {
       driverClass = Class.forName(driver);
