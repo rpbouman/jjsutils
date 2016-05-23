@@ -1,0 +1,33 @@
+Start the script without parameters to see the full list of options and their default values:
+
+jjs -scripting -Djjsml.main.module=src/sap/hana/hdbtable/generateHdbTables.js src/jjsml/jjsml.js
+
+Output:
+
+catalog   Catalog to load objects from. (null)
+directory Where to save the output files. (C:\Users\rbouman)
+driver    Fully qualified class name of the JDBC Driver. (com.sap.db.jdbc.Driver)
+jar       Location of the .jar file containing the JDBC driver. (C:\Program Files\sap\hdbclient\ngdbc.jar)
+overwrite Whether to overwrite existing files. (false)
+password  Password to establish JDBC connection. (undefined)
+schema    schema to load objects from. (null)
+tables    tables to load. (%)
+url       URL to establish JDBC connection. (undefined)
+user      User to establish JDBC connection. (undefined)
+
+When actually generating hdbdd files, use this type of invocation:
+
+jjs -scripting -J-Djava.class.path=lib/jjsutils-20160309.jar -Djjsml.main.module=src/sap/hana/hdbtable/generateHdbTables.js src/jjsml/jjsml.js -- jar=/c/jars/ngdbc.jar tables=%_GHCN% user=RBOUMAN password=password url=jdbc:sap://yourhost:3yourinstance15/
+
+You will be prompted for any ommitted arguments that do not have a defined default value.
+
+Note the passing of the class path:
+
+-J-Djava.class.path=lib/jjsutils-20160309.jar
+
+This ensures that the script can find the jssutils jar wich contains a delegating JDBC driver. This in turn allows loading and using a JDBC driver at runtime based on the filename of a jar containing the actual driver class.
+For any typical java program, passing -Djava.class.path=lib/jjsutils-20160309.jar would typically be enough, but for jjs we have to prefix that with a -J.
+
+Note the passing of the actual arguments after the -- token (this is a jjs thing) 
+
+jjs -scripting -J-Djava.class.path=lib/jjsutils-20160309.jar -Djjsml.main.module=src/sap/hana/hdbtable/generateHdbTables.js src/jjsml/jjsml.js -- jar=/c/jars/ngdbc.jar tables=%_GHCN% user=RBOUMAN password=password url=jdbc:sap://yourhost:3yourinstance15/

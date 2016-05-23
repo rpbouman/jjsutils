@@ -1,0 +1,1 @@
+jjs -scripting -J-Djava.class.path=lib/jjsutils-20160309.jar -Djjsml.main.module=src/sap/hana/cds/generateCDSPersistenceModel.js src/jjsml/jjsml.js -- datadir=data hanahost=yourhost hanainstance=yourinstance hanapassword=password hanaschema=RBOUMAN hanauser=RBOUMAN projectdir=C:\Users\rbouman\hana_work\HDB_NEW_RBOUMAN\__empty__\system-local\public\rbouman\hxmla

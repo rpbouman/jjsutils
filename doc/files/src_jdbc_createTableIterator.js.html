@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src\jdbc\createTableIterator.js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: </em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/Args.html">Args</a></li>
+                                <li><a href="../classes/Global.html">Global</a></li>
+                                <li><a href="../classes/JDBC.html">JDBC</a></li>
+                                <li><a href="../classes/JDBCConnectionProperties.html">JDBCConnectionProperties</a></li>
+                                <li><a href="../classes/ResultsetIterator.html">ResultsetIterator</a></li>
+                                <li><a href="../classes/ResultsetIteratorCallbacks.html">ResultsetIteratorCallbacks</a></li>
+                                <li><a href="../classes/TabeIteratorFactory.html">TabeIteratorFactory</a></li>
+                                <li><a href="../classes/TableIteratorCallbacks.html">TableIteratorCallbacks</a></li>
+                                <li><a href="../classes/TableIteratorSample.html">TableIteratorSample</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/Args.html">Args</a></li>
+                                <li><a href="../modules/jdbc.html">jdbc</a></li>
+                                <li><a href="../modules/jjsml.html">jjsml</a></li>
+                                <li><a href="../modules/resultsetIterator.html">resultsetIterator</a></li>
+                                <li><a href="../modules/TabeIterator.html">TabeIterator</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: src\jdbc\createTableIterator.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+* @module TabeIterator
+*/
+(function(exports){
+/**
+*
+* A factory for creating table Iterators.
+* A table iterator enables iteration over the table metadata exposed by a JDBC connection.
+* (see: see: java.sql.DatabaseMetaData#getTables))
+*
+* In addition to just enabling iteration over the tables, the table iterator also has 
+* methods to retrieve and iterate over related metadata, such as 
+* columns, primary key columns, imported key columns (foreign key columns), 
+* exported key columns (foreign key columns that refer to the current table), and
+* index columns.
+*
+* For an example of how to use the TabeIteratorFactory, checkout the TableIteratorSample.
+*
+* @class TabeIteratorFactory
+* @static
+* @requires jdbc
+* @requires resultsetIterator
+*/
+
+  return define(
+    &quot;jdbc.js&quot;, &quot;iterateResultset.js&quot;, 
+    function(jdbc, iterateResultset){
+      
+      /**
+      *
+      * Takes connection properties to establish a jdbc connection, 
+      * and applies the specified filter to obtain (a subset of) its table metdata.
+      * Finally, it creates an ResultsetIterator for the table metadata, 
+      * which uses the specified callbacks.
+      *
+      * @method createTableIterator
+      * @param {JDBCConnectionProperties} connectionProperties
+      * @param {object} filter
+      * @param {TableIteratorCallbacks} callbacks
+      */
+      function createTableIterator(connectionProperties, filter, callbacks){
+        var connection;
+        var connectionPropertiesType = typeof(connectionProperties);
+        switch (connectionPropertiesType) {
+          case &quot;string&quot;:
+            connection = jdbc.get(connectionProperties);
+            break;
+          case &quot;object&quot;:
+            connection = jdbc.open(connectionProperties);
+            break;
+          default:
+            throw new Error(&quot;Connectionproperties must be either a connection name or a object specifying connection properties.&quot;);
+        }
+        var metadata = connection.getMetaData();
+        
+        var catalog = filter.catalog || null;
+        var schemaPattern = filter.schemaPattern || null;
+        var tablePattern = filter.tablePattern || &quot;%&quot;;
+        var tableTypes = filter.tableTypes;
+        if (!tableTypes) {
+          tableTypes = null;
+        }
+        else
+        if (typeof(tableTypes) === &quot;string&quot;) {
+          tableTypes = tableTypes.split(&quot;,&quot;);
+        }
+        
+        var tables = metadata.getTables(catalog, schemaPattern, tablePattern, tableTypes);
+
+        function getCatalogSchemaTable(){
+          var row = this.row;
+          return {
+            catalog: row.TABLE_CAT, 
+            schema: row.TABLE_SCHEM, 
+            table: row.TABLE_NAME
+          };
+        }
+        
+        function closeConnection(){
+          if (typeof(connectionProperties) === &quot;string&quot;) {
+            return;
+          }
+          try {
+            connection.close();
+          }
+          catch (e){
+            //fall through. Not much we can do here.
+          }
+        }
+        
+        var me = callbacks;
+        /**
+        *
+        * The TableIteratorCallbacks class is a {{#crosslink &quot;ResultsetIterator&quot;}}{{/crossLink}}.
+        * The caller can provide all the usual hooks for a plain {{#crosslink &quot;ResultsetIterator&quot;}}{{/crossLink}}, 
+        * and then pass it to the {{#crosslink &quot;TabeIteratorFactory/createTableIterator:method&quot;}} method.
+        *
+        * @class TableIteratorCallbacks
+        * @extends ResultsetIteratorCallbacks
+        */
+        var methods = {
+          /**
+          * Do the iteration over the tables associated with the connection and the passed filter properties.
+          *
+          * @method iterate
+          */
+          iterate: function(){
+            var output = iterateResultset(tables, me);
+            closeConnection();
+            return output;
+          },
+          /**
+          * Retrieves the columns associated with the table that is currently considered in the iteration, 
+          * and iterates through those.
+          *
+          * @method iterateColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of columns.
+          */
+          iterateColumns: function(callbacks){
+            var args = getCatalogSchemaTable.call(me);
+            var resultset = metadata.getColumns(args.catalog, args.schema, args.table, &quot;%&quot;);
+            return iterateResultset(resultset, callbacks);
+          },
+          /**
+          * Retrieves the primary key columns associated with the table that is currently considered in the iteration, 
+          * and iterates through those.
+          *
+          * @method iteratePrimaryKeyColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of primary key columns.
+          */
+          iteratePrimaryKeyColumns: function(callbacks){
+            var args = getCatalogSchemaTable.call(me);
+            var resultset = metadata.getPrimaryKeys(args.catalog, args.schema, args.table);
+            return iterateResultset(resultset, callbacks);
+          },
+          /**
+          * Retrieves the imported key columns (i.e. those columns on which a foreign key is defined) associated with the table that is currently considered in the iteration, 
+          * and iterates through those.
+          *
+          * @method iteratePrimaryKeyColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of imported key columns.
+          */
+          iterateImportedKeyColumns: function(callbacks){
+            var args = getCatalogSchemaTable.call(me);
+            var resultset = metadata.getImportedKeys(args.catalog, args.schema, args.table);
+            return iterateResultset(resultset, callbacks);
+          },
+          /**
+          * Retrieves the exported key columns (i.e. those columns from this table that are referenced by foreign keys in other tables) associated 
+          * with the table that is currently considered in the iteration, and iterates through those.
+          *
+          * @method iterateImportedKeyColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of imported key columns.
+          */
+          iterateExportedKeyColumns: function(callbacks){
+            var args = getCatalogSchemaTable.call(me);
+            var resultset = metadata.getExportedKeys.apply(metadata, args);
+            return iterateResultset(resultset, callbacks);
+          },
+          /**
+          * Retrieves the index columns associated with the table that is currently considered in the iteration, and iterates through those.
+          *
+          * @method iterateIndexColumns
+          * @param {ResultsetIteratorCallbacks} callbacks Object containing the hooks to be called while iterating through this set of index columns.
+          */
+          iterateIndexColumns: function(callbacks, unique, approximate){
+            var args = getCatalogSchemaTable.call(me);
+            unique = unique || false;
+            approximate = approximate || true;
+            var resultset = metadata.getIndexInfo(args.catalog, args.schema, args.table, unique, approximate);
+            return iterateResultset(resultset, callbacks);
+          }
+        };
+        
+        var method;
+        for (method in methods){
+          callbacks[method] = methods[method];
+        }
+                
+        return callbacks;
+      }
+      return createTableIterator;
+    }
+  );
+})(this);
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

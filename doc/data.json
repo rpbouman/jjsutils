@@ -1,0 +1,781 @@
+{
+    "project": {},
+    "files": {
+        "src\\args\\args.js": {
+            "name": "src\\args\\args.js",
+            "modules": {
+                "Args": 1
+            },
+            "classes": {
+                "Args": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\jdbc\\TableIteratorSample.js": {
+            "name": "src\\jdbc\\TableIteratorSample.js",
+            "modules": {},
+            "classes": {
+                "TableIteratorSample": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\jdbc\\createTableIterator.js": {
+            "name": "src\\jdbc\\createTableIterator.js",
+            "modules": {
+                "TabeIterator": 1
+            },
+            "classes": {
+                "TabeIteratorFactory": 1,
+                "TableIteratorCallbacks": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\jdbc\\iterateResultset.js": {
+            "name": "src\\jdbc\\iterateResultset.js",
+            "modules": {
+                "resultsetIterator": 1
+            },
+            "classes": {
+                "ResultsetIterator": 1,
+                "ResultsetIteratorCallbacks": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\jdbc\\jdbc.js": {
+            "name": "src\\jdbc\\jdbc.js",
+            "modules": {
+                "jdbc": 1
+            },
+            "classes": {
+                "JDBCConnectionProperties": 1,
+                "JDBC": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\jjsml\\jjsml.js": {
+            "name": "src\\jjsml\\jjsml.js",
+            "modules": {
+                "jjsml": 1
+            },
+            "classes": {
+                "Global": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "Args": {
+            "name": "Args",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "Args": 1,
+                "TableIteratorSample": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\jdbc\\TableIteratorSample.js",
+            "line": 3,
+            "description": "Commandline arguments for jjs. jjs accepts user arguments after the -- on its commandline.\n This module provides functionality to define, document, parse, and prompt for jjs arguments\n specified as &lt;name&gt;=&lt;value&gt; pairs.\nTypically you would acquire this module by naming it as a dependency to a call to `define()` when defining a user module.\n The object passed to the `define()` callback to represent the dependency can be treated as a singleton `Args` class,\n which exposes all functonality to work with arguments as static methods."
+        },
+        "TabeIterator": {
+            "name": "TabeIterator",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "TabeIteratorFactory": 1,
+                "TableIteratorCallbacks": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 92
+        },
+        "resultsetIterator": {
+            "name": "resultsetIterator",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "ResultsetIterator": 1,
+                "ResultsetIteratorCallbacks": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 81
+        },
+        "jdbc": {
+            "name": "jdbc",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "JDBCConnectionProperties": 1,
+                "JDBC": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 40,
+            "description": "The jdbc module provides access to java database connectivity (JDBC).\nTypically you acquire access to the module by naming it as a dependency in a call to `define()` \nwhen defining your own module.\nThe object passed to the `define()` callback to represent the dependency can be considered \na singleton `jdbc` class, which exposes all its functionality as static methods."
+        },
+        "jjsml": {
+            "name": "jjsml",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "Global": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\jjsml\\jjsml.js",
+            "line": 20,
+            "description": "A module loader for jjs, the javascript shell based on Nashorn that ships with Oracle JDK 1.8.\n\nThe shell comes with built-in functions to load external scripts (and files).\nUnfortunately, it does not come with support for module and dependency loading.\nAlso, dealing with relative paths is a challenge, since jjs resolves those\nwith respect to the program working directory (that is, the dir from whence jjs was run).\n\nThe jjsml module tries to provide a solution for these problems.\n\nThe jjsml module exports a single global `define()` function \nwhich can be used to define and load modules, and to load their dependencies.\nIn addition, the jjsml module detects whether a main module was specified through the\n`jjsml.main.module` java System property.\nWhen specified, this module will be loaded automatically, acting as an entrypoint."
+        }
+    },
+    "classes": {
+        "Args": {
+            "name": "Args",
+            "shortname": "Args",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Args",
+            "namespace": "",
+            "file": "src\\args\\args.js",
+            "line": 14,
+            "description": "For example, suppose you want to create a jjs command line utility that can accept \narguments arg1 and arg2, then you could use the Args module like this:\n\n    (function(){\n        define(\"../../src/args/args.js\", function(args){\n        \n          //1) use args.define() to pass one or more argDef objects\n          args.define({     \n            name: \"arg1\",                                         //name property is used for name in a &lt;name&gt;=&lt;value&gt; pair\n            help: \"This is arg1 for this command line utility.\"   //help is used to provide users with a clue on what value to enter\n            value: \"Hello\"                                        //value may be used to specify a default value\n            parse: function(value){                               //parse() may be specified to validate and convert value \n              ...code to convert string value from default value or passed on the command line to appropriate internal argument value \n            }\n          }, {\n            name: \"arg2\",\n            help: \"This is arg2 for this command line utility.\",\n            mandatory: true                                       //mandatory stipulates that this argument is mandatory\n          });\n\n          //2) use args.init() to parse and validate arguments passed on the command line.\n          args.init();\n\n          //3) if necessary use args.show() to print all arguments along with their help text\n          //(in this case: \"necessary\" is when no arguments where specified)\n          if ($ARG.length === 0){\n            args.show();\n            exit();\n          }\n\n          //4) for those mandatory arguments that do not have received a value, prompt the user.\n          args.prompt();\n\n          //5) use args.get(&lt;name&gt;) to get the value of an argument and use it in your script.\n          var arg1 = args.get(\"arg1\");\n          print(arg1);\n\n          var arg2 = args.get(\"arg2\");\n          print(arg2);\n        });\n    })()\n\n Suppose this would be in `examples/exampleX/myScript.js`. Then running it as follows:\n\n   $ jjs -scripting -Djjsml.main.module=myScript.js ../../src/jjsml/jjsml.js -- arg2=World!\n   Hello\n   World!\n \n So, `arg1` takes on the default value, and `arg2` the value `\"World!\"`, which was passed at the command line.\n\n If no arguments would be passed on the command line, the output would be:\n\n   $ jjs -scripting -Djjsml.main.module=myScript.js ../../src/jjsml/jjsml.js\n   arg1 This is arg1 for this command line utility. (Hello)\n   arg2 This is arg2 for this command line utility. (undefined)\n\n The output shown comes from the call to the `show()` function which shows all defined arguments\n and their current value.\n\n If we would pass an argument for `arg1`, but not for the mandatory argument `arg2`, we'd be prompted:\n\n $ jjs -scripting -Djjsml.main.module=myScript.js ../../src/jjsml/jjsml.js -- arg1=Goodbye\n arg2? args\n Goodbye\n args\n\n Note: in the output above, the `arg2?` is the program prompting the user; \n `args` is the value entered by the user in response to the prompt.\n The next two lines is the program output caused by the invokating of `print()` on the argument values.",
+            "static": 1
+        },
+        "TableIteratorSample": {
+            "name": "TableIteratorSample",
+            "shortname": "TableIteratorSample",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Args",
+            "namespace": "",
+            "file": "src\\jdbc\\TableIteratorSample.js",
+            "line": 3,
+            "description": "This is a sample to illustrate how you can use the TableIteratorFactory.\nThe TableIteratorSample can be run as a command line program, like so:\n\n    jjs -scripting -Djjsml.main.module=src/jdbc/TableIteratorSample.js src/jjsml/jjsml.js\n\nThe script takes command line arguments to specify a JDBC connection, \nand will then print out tables, columns, primary keys etc. info.\n\nYou can use this script as a basis to create scripts that generate DDL or so.",
+            "static": 1
+        },
+        "TabeIteratorFactory": {
+            "name": "TabeIteratorFactory",
+            "shortname": "TabeIteratorFactory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "TabeIterator",
+            "namespace": "",
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 5,
+            "description": "A factory for creating table Iterators.\n A table iterator enables iteration over the table metadata exposed by a JDBC connection.\n (see: see: java.sql.DatabaseMetaData#getTables))\nIn addition to just enabling iteration over the tables, the table iterator also has \n methods to retrieve and iterate over related metadata, such as \n columns, primary key columns, imported key columns (foreign key columns), \n exported key columns (foreign key columns that refer to the current table), and\n index columns.\nFor an example of how to use the TabeIteratorFactory, checkout the TableIteratorSample.",
+            "static": 1,
+            "requires": [
+                "jdbc",
+                "resultsetIterator"
+            ]
+        },
+        "TableIteratorCallbacks": {
+            "name": "TableIteratorCallbacks",
+            "shortname": "TableIteratorCallbacks",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "TabeIterator",
+            "namespace": "",
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 92,
+            "description": "The TableIteratorCallbacks class is a {{#crosslink \"ResultsetIterator\"}}{{/crossLink}}.\n The caller can provide all the usual hooks for a plain {{#crosslink \"ResultsetIterator\"}}{{/crossLink}}, \n and then pass it to the {{#crosslink \"TabeIteratorFactory/createTableIterator:method\"}} method.",
+            "extends": "ResultsetIteratorCallbacks"
+        },
+        "ResultsetIterator": {
+            "name": "ResultsetIterator",
+            "shortname": "ResultsetIterator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "resultsetIterator",
+            "namespace": "",
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 5,
+            "description": "Provides a convenient way to traverse JDBC resultsets.\nAccess to the iteration is provided via a number of hooks that the caller can implement in the `callbacks` argument.\n\nExample:\n\n    (function(){\n      define(\n        \"src/jdbc/jdbc.js\", \n        \"src/jdbc/iterateResultset.js\", \n        function(iterateResultset){\n\n          //create a connection\n          var conn = jdbc.openConnection({\n            driver: \"com.mysql.jdbc.Driver\",\n            url: \"jdbc:mysql://localhost/sakila\",\n            user: \"sakila\",\n            password: \"sakila\"\n          });\n\n          //create a statement\n          var stmt = conn.createStatement();\n\n          //run a query\n          stmt.execute(\"SELECT * FROM films\");\n\n          //obtain the query result\n          var resultset = stmt.getResultSet();\n\n          //iterate the resultset\n          iterateResultset(resultset, {\n            beforeAll: function(){\n             \n            }   \n          });\n        });\n      )\n    })();",
+            "static": 1
+        },
+        "ResultsetIteratorCallbacks": {
+            "name": "ResultsetIteratorCallbacks",
+            "shortname": "ResultsetIteratorCallbacks",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "resultsetIterator",
+            "namespace": "",
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 81,
+            "description": "Objects that are passed as `callbacks` parameter to `iterateResultSet()` may have a number of callback functions \nthat are called during the iteration of the java.sql.Resultset that was also passed to `iterateResultSet()`.\n\nFor documentation purposes we refer to such objects as ResultsetIteratorCallbacks.\n\nResultsetIteratorCallbacks can implement a number of callbacks to be called during specific stages of resultset iteration.\nResultsetIteratorCallbacks are also augmented with a number of properties to access data from the resultset."
+        },
+        "JDBCConnectionProperties": {
+            "name": "JDBCConnectionProperties",
+            "shortname": "JDBCConnectionProperties",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jdbc",
+            "namespace": "",
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 11,
+            "description": "This is not a standalone class. Rather it describes the properties required to establish a JDBC connection.\nAs such it appears as type for arguments to various methods that use JDBC."
+        },
+        "JDBC": {
+            "name": "JDBC",
+            "shortname": "JDBC",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jdbc",
+            "namespace": "",
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 40,
+            "description": "A class to create JDBC database connections.\nCan also load JDBC drivers dynamically from a jar file.\n\nExample:\n\n    (function(){\n      define(\"src/jdbc/jdbc.js\", function(jdbc){\n\n        var connection = jdbc.openConnection({\n          //optional: specify a name so you can refer to this connection by name later on`\n          name: \"My Sakila Connection\",\n          //The fully qualified class name of the driver. Optional if you're sure the driver was already registered.\n          driver: \"com.mysql.jdbc.Driver\",\n          //A string that can be resolved as a path identifying a jar file that contains the driver.\n          //This is required to load drivers dyntamically from jar files that are not on the class path.\n          jar: \"/usr/share/java/mysql-connection-java-5.1.38-bin.jar\",\n          //The driver specific JDBC url to connect to your database.\n          url: \"jdbc:mysql://localhost/sakila\",\n          //JDBC user.\n          user: \"sakila\",\n          //JDBC password.\n          password: \"sakila\"\n        });\n\n        ...use the connection...\n\n        //get an existing connection\n        var connection = jdbc.getConnection(\"My Sakila Connection\");\n\n        //close existing connection\n        jdbc.closeConnection(\"My Sakila Connection\");\n\n        //You can also explicitly close the connection itself:\n        connection.close();\n\n      });\n    })();",
+            "static": 1
+        },
+        "Global": {
+            "name": "Global",
+            "shortname": "Global",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jjsml",
+            "namespace": "",
+            "file": "src\\jjsml\\jjsml.js",
+            "line": 20,
+            "description": "The global object.",
+            "static": 1
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "src\\args\\args.js",
+            "line": 97,
+            "description": "Defines a command line argument.",
+            "itemtype": "method",
+            "name": "define",
+            "static": 1,
+            "params": [
+                {
+                    "name": "argDef",
+                    "description": "argument definition object.",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "class": "Args",
+            "module": "Args"
+        },
+        {
+            "file": "src\\args\\args.js",
+            "line": 137,
+            "description": "Set the value of a defined argument.\nThis can be useful in case you have some custom program logic \nthat knows how to set a default value for an existing command line argument.\n\nIf the argDef identified by the `name` param defines a `parse()` method, then \nthat method will be called and passed the value, and the return value of the \n`parse()` method will be assigned as the argument's actual value.",
+            "itemtype": "method",
+            "name": "set",
+            "static": 1,
+            "params": [
+                {
+                    "name": "name",
+                    "description": "Name of the argument to which the value will be assigned."
+                },
+                {
+                    "name": "value",
+                    "description": "Value that will be assigned to the argument."
+                }
+            ],
+            "class": "Args",
+            "module": "Args"
+        },
+        {
+            "file": "src\\args\\args.js",
+            "line": 160,
+            "description": "Gets the value of the specified, previously defined and initialzed command line argument. \nNote that for typical usages, `init()` should be called (once) prior to any calls to `get()`",
+            "itemtype": "method",
+            "name": "get",
+            "static": 1,
+            "params": [
+                {
+                    "name": "name",
+                    "description": "name of the argument.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Returns the value of the specified command line argument."
+            },
+            "class": "Args",
+            "module": "Args"
+        },
+        {
+            "file": "src\\args\\args.js",
+            "line": 192,
+            "description": "prints the arguments, along with their help text and their current value.\nUseful as a \"usage\" help message",
+            "itemtype": "method",
+            "name": "show",
+            "static": 1,
+            "class": "Args",
+            "module": "Args"
+        },
+        {
+            "file": "src\\args\\args.js",
+            "line": 224,
+            "description": "Parses the actual command line arguments and matches them to the defined `argDef` objects to set their value.\nAlso, sets the default values for those arguments that were not specified on the command line but have a default value.",
+            "itemtype": "method",
+            "name": "init",
+            "static": 1,
+            "class": "Args",
+            "module": "Args"
+        },
+        {
+            "file": "src\\args\\args.js",
+            "line": 250,
+            "description": "Prompt the user for any mandatory arguments that do not yet have a value.\nNote that `init()` should have been called (once) prior to the call to `prompt()`",
+            "itemtype": "method",
+            "name": "prompt",
+            "static": 1,
+            "class": "Args",
+            "module": "Args"
+        },
+        {
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 29,
+            "description": "Takes connection properties to establish a jdbc connection, \n and applies the specified filter to obtain (a subset of) its table metdata.\n Finally, it creates an ResultsetIterator for the table metadata, \n which uses the specified callbacks.",
+            "itemtype": "method",
+            "name": "createTableIterator",
+            "params": [
+                {
+                    "name": "connectionProperties",
+                    "description": "",
+                    "type": "JDBCConnectionProperties"
+                },
+                {
+                    "name": "filter",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "callbacks",
+                    "description": "",
+                    "type": "TableIteratorCallbacks"
+                }
+            ],
+            "class": "TabeIteratorFactory",
+            "module": "TabeIterator"
+        },
+        {
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 102,
+            "description": "Do the iteration over the tables associated with the connection and the passed filter properties.",
+            "itemtype": "method",
+            "name": "iterate",
+            "class": "TableIteratorCallbacks",
+            "module": "TabeIterator"
+        },
+        {
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 112,
+            "description": "Retrieves the columns associated with the table that is currently considered in the iteration, \nand iterates through those.",
+            "itemtype": "method",
+            "name": "iterateColumns",
+            "params": [
+                {
+                    "name": "callbacks",
+                    "description": "Object containing the hooks to be called while iterating through this set of columns.",
+                    "type": "ResultsetIteratorCallbacks"
+                }
+            ],
+            "class": "TableIteratorCallbacks",
+            "module": "TabeIterator"
+        },
+        {
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 124,
+            "description": "Retrieves the primary key columns associated with the table that is currently considered in the iteration, \nand iterates through those.",
+            "itemtype": "method",
+            "name": "iteratePrimaryKeyColumns",
+            "params": [
+                {
+                    "name": "callbacks",
+                    "description": "Object containing the hooks to be called while iterating through this set of primary key columns.",
+                    "type": "ResultsetIteratorCallbacks"
+                }
+            ],
+            "class": "TableIteratorCallbacks",
+            "module": "TabeIterator"
+        },
+        {
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 136,
+            "description": "Retrieves the imported key columns (i.e. those columns on which a foreign key is defined) associated with the table that is currently considered in the iteration, \nand iterates through those.",
+            "itemtype": "method",
+            "name": "iteratePrimaryKeyColumns",
+            "params": [
+                {
+                    "name": "callbacks",
+                    "description": "Object containing the hooks to be called while iterating through this set of imported key columns.",
+                    "type": "ResultsetIteratorCallbacks"
+                }
+            ],
+            "class": "TableIteratorCallbacks",
+            "module": "TabeIterator"
+        },
+        {
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 148,
+            "description": "Retrieves the exported key columns (i.e. those columns from this table that are referenced by foreign keys in other tables) associated \nwith the table that is currently considered in the iteration, and iterates through those.",
+            "itemtype": "method",
+            "name": "iterateImportedKeyColumns",
+            "params": [
+                {
+                    "name": "callbacks",
+                    "description": "Object containing the hooks to be called while iterating through this set of imported key columns.",
+                    "type": "ResultsetIteratorCallbacks"
+                }
+            ],
+            "class": "TableIteratorCallbacks",
+            "module": "TabeIterator"
+        },
+        {
+            "file": "src\\jdbc\\createTableIterator.js",
+            "line": 160,
+            "description": "Retrieves the index columns associated with the table that is currently considered in the iteration, and iterates through those.",
+            "itemtype": "method",
+            "name": "iterateIndexColumns",
+            "params": [
+                {
+                    "name": "callbacks",
+                    "description": "Object containing the hooks to be called while iterating through this set of index columns.",
+                    "type": "ResultsetIteratorCallbacks"
+                }
+            ],
+            "class": "TableIteratorCallbacks",
+            "module": "TabeIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 55,
+            "description": "Provides a convenient way to traverse JDBC resultsets.\nAccess to the iteration is provided via a number of hooks that the caller can implement in the `callbacks` argument.\nThe specified callback functions are called in scope of the `callbacks` object.\nIn addition, the `callbacks` object is augmented with a few properties to conveniently access the current state of\nthe iteration. Properties that are added are:\n\n* `columns`. An object that stores column metadata by column name.\n* `row`. And object that represents the current row of the resultset. Values are stored by column name.\n* `rowNum`. An integer indicating how many rows have been processed.\n\nThe hooks that the caller can specify are:\n* `beforeAll()`: Is called once before any iterations are done.\n* `beforeFirst()`: Is called once, right before the first row is iterated. Difference with `beforeAll()` is that `beforeFirst()` is called only when there actually are any rows to iterate, whereas `beforeAll()` is always called, even if there are no rows to iterate.\n* `forEach()`: Is called for each row that is iterated.\n* `afterLast()`: Is called right after the last row was iterated. It is called only if there were any rows to iterate.\n* `afterAll()`: Is called right after the entire iteration sequence. `afterAll()` is always called - even if there were no rows to iterate.\n* `ifNone()`: Is called after `beforeAll()` but before `afterAll()`, but only if there were no rows to iterate.",
+            "itemtype": "method",
+            "name": "iterateResultSet",
+            "static": 1,
+            "params": [
+                {
+                    "name": "resultSet",
+                    "description": "The `java.sql.ResultSet` to iterate.",
+                    "type": "java.sql.ResultSet"
+                },
+                {
+                    "name": "callbacks",
+                    "description": "A callback object having one or more callback functions (hooks) that are called in particualr stages of the iteration process.",
+                    "type": "ResultsetIteratorCallbacks"
+                }
+            ],
+            "class": "ResultsetIterator",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 93,
+            "description": "The columns property is an object that holds metadata that describes the columns of the iterated resultset.\n The data for this is obtained from the java.sql.ResultSetMetaData object that is associated with the resultset.\nKeys of the columns object are the column names. \n Values of the columns object are objects that describe the properties for the result set column as key/value pairs.",
+            "itemtype": "property",
+            "name": "columns",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 105,
+            "description": "The row property is an object that holds the values of the row currently being iterated. \n Keys of the row property object are the column names of the resultset.\n Values are obtained by calling java.sql.ResultSet#getObject for the respective column.",
+            "itemtype": "property",
+            "name": "row",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 115,
+            "description": "The 1-based ordinal position of the row that is currently being considered by the iterator.",
+            "itemtype": "property",
+            "name": "rowNum",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 165,
+            "description": "The beforeAll callback is called before any rows are iterated.\nIt is always called, even if it turns out that there aren't any rows to iterate over.",
+            "itemtype": "method",
+            "name": "beforeAll",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 177,
+            "description": "The beforeFirst callback is called right before the first row is iterated.\nIt will only be called if there are in fact rows to iterate.",
+            "itemtype": "method",
+            "name": "beforeFirst",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 191,
+            "description": "The forEach callback is called for each row in the resultset.",
+            "itemtype": "method",
+            "name": "forEach",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 203,
+            "description": "The ifNone callback is called only if there are no rows to iterate.\nifNone is called after `beforeAll()`, but before `afterAll()`.",
+            "itemtype": "method",
+            "name": "ifNone",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 214,
+            "description": "The afterLast callback is called after all rows have been iterated.\nIt is called only if there was at least one row in the resultset.      \nIf it is called, it is called right before the `afterAll()` callback.",
+            "itemtype": "method",
+            "name": "afterLast",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\iterateResultset.js",
+            "line": 226,
+            "description": "The afterAll callback is called after iteration.\nIt is always called, even if there were no rows in the resultset.",
+            "itemtype": "method",
+            "name": "afterAll",
+            "class": "ResultsetIteratorCallbacks",
+            "module": "resultsetIterator"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 18,
+            "description": "The name for the connection. If the name is present when the JDBCConnectionProperties object is passed to a method\nthat creates a connection, then this name will be used to store this connection in a connection cache. The name can\nthen later be used to retrieve the connection.\nIf passed to functions that just need a connection to work with, then an attempt will be made to retrieve the connection.\nIf the connection cannot be retrieved, and the JDBCConnectionProperties also contains properties that can be used to create \na connection, then a connection will be created and stored under this name.",
+            "itemtype": "property",
+            "name": "name The name that will be used to store this connection in the connection cache.",
+            "type": "Name",
+            "optional": 1,
+            "class": "JDBCConnectionProperties",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 30,
+            "description": "If present, the driver property will be used to load the JDBC driver class. \n This should take care of registering the driver with the JDBC DriverManager.",
+            "itemtype": "property",
+            "name": "driver The fully qualified (java) class name of the JDBC driver that manages the connection.",
+            "type": "String",
+            "optional": 1,
+            "class": "JDBCConnectionProperties",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 99,
+            "description": "Load a JDBC driver, and register it with the JDBC DriverManager.\nThe `conf` argument can either be a string, or an object.\nIf it is a string, it should be the fully qualified class name of the driver.\n This class will then be loaded and this should automatically register the driver with the driver manager.\n In order for this to work, the driver should already be on the system classpath.\n To dynamically load a JDBC driver from a jar that is not on the classpath, consider passing a `conf` object instead.\n \n If `conf` is an object, it should have a `driver` key, which should be the fully qualified class name of the driver.\nOptionally, the conf object can contain a `jar` key. \n If a `jar` key is specified, then an attempt will be made to load the driver class from the specified jarfile.\n To register the driver with the DriverManager, it is passed to an instance of the jjsutils DriverDelegate.\n The DriverDelegate is a utility class that wraps the dyncamically loaded Driver from the jar.\n Since the DriverDelegate is assumed to be in the classpath, this can be succesfully registred by the DriverManager.",
+            "itemtype": "method",
+            "name": "loadDriver",
+            "params": [
+                {
+                    "name": "conf",
+                    "description": "",
+                    "type": "String | JDBCConnectionProperties"
+                }
+            ],
+            "static": 1,
+            "class": "JDBC",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 156,
+            "description": "Opens a JDBC connection based on properties passed in the argument configuration object.\n\nThe configuration object supports the following properties:\n* driver\n* jar\n* url\n* user\n* password\n* name\n\nThe driver and jar properties maybe used by `loadDriver()` to load the driver.\nThe url, user and password properties are used to obtain a connection from the JDBC DriverManager\nThe name (if present) will be used to store this connection in a cache of connections.\nThis way you can later refer to this connection by name using `getConnection()`.",
+            "itemtype": "method",
+            "name": "openConnection",
+            "static": 1,
+            "params": [
+                {
+                    "name": "conf",
+                    "description": "An object that specifies data required to actually establish the JDBC connection.",
+                    "type": "JDBCConnectionProperties"
+                }
+            ],
+            "return": {
+                "description": "Retuns the JDBC connection.",
+                "type": "java.sql.Connection"
+            },
+            "class": "JDBC",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 185,
+            "description": "Obtain a connection created prior with `openConnection()`.",
+            "itemtype": "method",
+            "name": "getConnection",
+            "static": 1,
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of a connection created prior using `openConnection()`.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The connection.",
+                "type": "java.sql.Connection"
+            },
+            "class": "JDBC",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 224,
+            "description": "Execute a SQL-SELECT statement (a query) and obtain the results.",
+            "itemtype": "method",
+            "name": "query",
+            "static": 1,
+            "params": [
+                {
+                    "name": "connection",
+                    "description": "Either a connection name, or an object such as one would pass to `openConnection()`.",
+                    "type": "String | object"
+                },
+                {
+                    "name": "sql",
+                    "description": "A SQL SELECT statement.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "A resultset object that represents the result of the SQL query.",
+                "type": "java.sql.ResultSet"
+            },
+            "class": "JDBC",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 249,
+            "description": "Execute a non-query SQL statement (a INSERT, UPDATE, DELETE or DDL statement) and obtain the results.",
+            "itemtype": "method",
+            "name": "execute",
+            "static": 1,
+            "params": [
+                {
+                    "name": "connection",
+                    "description": "Either a connection name, or an object such as one would pass to `openConnection()`.",
+                    "type": "String | object"
+                },
+                {
+                    "name": "sql",
+                    "description": "A SQL DDL statement, or INSERT, UPDATE, DELETE statement.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "A resultset object that represents the result of the SQL query.",
+                "type": "java.sql.ResultSet"
+            },
+            "class": "JDBC",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 274,
+            "description": "Close a connection created prior with `openConnection()`, and remove it from the connection cache.",
+            "itemtype": "method",
+            "name": "closeConnection",
+            "static": 1,
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of a connection created prior using `openConnection()`.",
+                    "type": "String"
+                }
+            ],
+            "class": "JDBC",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jdbc\\jdbc.js",
+            "line": 290,
+            "description": "Closes all connections stored in the connection cache.",
+            "itemtype": "method",
+            "name": "closeAllConnections",
+            "static": 1,
+            "class": "JDBC",
+            "module": "jdbc"
+        },
+        {
+            "file": "src\\jjsml\\jjsml.js",
+            "line": 129,
+            "description": "Defines a module. \n\nThe `define()` function is available globally. \nIt allows you to cleanly define and expose functionality using the javascript module pattern.\n \nThe last argument passed to `define()` should be a callback function that actually defines the module.\nTypically the callback returns a value (usually of the object or function type) that provides access to the functionality of the module.\nFor example, a module could expose a constructor, or a factory function.\nAlternatively, a module could return a singleton object or a constant value.\nFinally, the callback could also expose its own global properties and/or functions.\n\n`define()` lets you load and manage any dependencies your module might have.\nAny dependencies can be passed as string arguments prior to the final callback argument.\n\nDependency argument are considered paths to javascript files that themselves typically define other modules.\nRelative paths are resolved against the location of the current module.\n\nDependencies loaded with `define()` are loaded only once.\nSubsequent requests for a module loaded prior are served from a module cache.\n\nExample module in file module3.js\n\n    (function(){\n\n      //use the define() method to define module1 and module2 as dependencies\n      //and to create and expose a new module \n      define(\n        \"tmp/module1.js\", \"../scripts/module2.js\",  //dependencies\n        function(module1, module2){                 //callback creates the actual module.\n          //this callback is called after module1 and module2 are loaded\n          //the callback is passed those dependencies as arguments so it can use them.\n          return {\n            ...define the actual module functionlity here...\n          };\n        }\n      );\n    })()  //in this example, \"this\" passed to the module is thought to be the Global object.",
+            "itemtype": "method",
+            "name": "define",
+            "params": [
+                {
+                    "name": "dependency",
+                    "description": "Modules upon which this module is dependent.",
+                    "type": "String",
+                    "optional": true,
+                    "multiple": true
+                },
+                {
+                    "name": "module",
+                    "description": "The module being defined. This should typically be a function, but it may also be a object, or a string identifying a script."
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "Global",
+            "module": "jjsml"
+        }
+    ],
+    "warnings": []
+}

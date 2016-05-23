@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src\jjsml\jjsml.js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: </em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/Args.html">Args</a></li>
+                                <li><a href="../classes/Global.html">Global</a></li>
+                                <li><a href="../classes/JDBC.html">JDBC</a></li>
+                                <li><a href="../classes/JDBCConnectionProperties.html">JDBCConnectionProperties</a></li>
+                                <li><a href="../classes/ResultsetIterator.html">ResultsetIterator</a></li>
+                                <li><a href="../classes/ResultsetIteratorCallbacks.html">ResultsetIteratorCallbacks</a></li>
+                                <li><a href="../classes/TabeIteratorFactory.html">TabeIteratorFactory</a></li>
+                                <li><a href="../classes/TableIteratorCallbacks.html">TableIteratorCallbacks</a></li>
+                                <li><a href="../classes/TableIteratorSample.html">TableIteratorSample</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/Args.html">Args</a></li>
+                                <li><a href="../modules/jdbc.html">jdbc</a></li>
+                                <li><a href="../modules/jjsml.html">jjsml</a></li>
+                                <li><a href="../modules/resultsetIterator.html">resultsetIterator</a></li>
+                                <li><a href="../modules/TabeIterator.html">TabeIterator</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: src\jjsml\jjsml.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+* A module loader for jjs, the javascript shell based on Nashorn that ships with Oracle JDK 1.8.
+*
+* The shell comes with built-in functions to load external scripts (and files).
+* Unfortunately, it does not come with support for module and dependency loading.
+* Also, dealing with relative paths is a challenge, since jjs resolves those
+* with respect to the program working directory (that is, the dir from whence jjs was run).
+*
+* The jjsml module tries to provide a solution for these problems.
+*
+* The jjsml module exports a single global &#x60;define()&#x60; function 
+* which can be used to define and load modules, and to load their dependencies.
+* In addition, the jjsml module detects whether a main module was specified through the
+* &#x60;jjsml.main.module&#x60; java System property.
+* When specified, this module will be loaded automatically, acting as an entrypoint.
+*
+* @module jjsml
+*/
+(function(exports){
+/**
+* The global object.
+*
+* @class Global
+* @static
+*/
+  //prevent overriding this script&#x27;s assets.
+  if (exports.define) {
+    return;
+  }
+  
+  var _builtinLoad = load;
+
+  var File = Java.type(&quot;java.io.File&quot;);
+  var separator = File.separator;
+  
+  function splitPath(path){
+    //split by backslash and slash. 
+    //we consider both as path element separator
+    return path.split(/[\/\\]/g);
+  }
+  
+  function getSystemProperty(name){
+    var System = Java.type(&quot;java.lang.System&quot;);
+    var value = System.getProperty(name);
+    return value;
+  }
+   
+  //current working directories.
+  //we need this to allow relative paths when loading modules.
+  var cwd = [];
+  //this is where we keep our modules.
+  //we use canonical path as key and the script object as returned by load() as value.
+  var modules = {};  
+  
+  //function to get a module from the cache,
+  //or else, load the module anew and store it in the cache.
+  function getModule(module, plainLoad) {
+    //split the module in script and path
+    var dir = splitPath(module);
+    var script = dir.pop();
+    
+    //obtain a file representing the module to load
+    var file = new File(dir.join(separator), script);
+    var isAbsolute = file.isAbsolute();
+    var peek, mark1 = cwd.length, mark2;
+    if (!isAbsolute) {
+      //module path is relative, so prepend current dir
+      peek = cwd[cwd.length - 1];
+      var path = peek.concat(dir).join(separator);
+      file = new File(path, script);
+    }
+    
+    //get the canonical path so we can check if the module was already loaded.
+    var canonicalPath = file.getCanonicalPath();
+    var moduleObject = modules[canonicalPath];
+    
+    if (plainLoad === true || typeof(moduleObject) === &quot;undefined&quot;){  //module not yet loaded. 
+      //Before loading the module we have to do some bookkeeping to the 
+      //current working directory
+      if (isAbsolute) { //absolute paths: need to put a new dir on the cwd stack
+        //remember current size of cwd stack so we can restore after loading this module.
+        mark = cwd.length;
+        //make the module dir the new current working dir. 
+        //Any relative paths loaded from this module will be resolved against this.
+        cwd.push(dir);
+        peek = dir;
+      }
+      else {  //relative path: need to update the current cwd.
+        //remember size of current cwd stack entry so we can restore it after loading the module.
+        mark2 = peek.length;
+        //append the path elements of the new module to the current cwd entry.
+        peek.push.apply(peek, dir);
+      }
+      
+      //use the canonical path to load the module.
+      //note that loading may (and probably will) result in many more requests to load modules.
+      moduleObject = _builtinLoad(canonicalPath);
+
+      if (isAbsolute) {
+        cwd.length = mark1;
+      }
+      else {
+        peek.length = mark2;
+      }
+      
+      if (plainLoad !== true) {
+        //check if the module was loaded succesfully
+        var moduleType = typeof(moduleObject);
+        if (moduleType === &quot;undefined&quot;) {
+          //Not sure yet what to do. If we throw an error, we can&#x27;t use define for &quot;normal&quot;, non-module script loading.
+          //I think it would be cool to be able to use it for those cases too.
+          //throw new Error(&quot;Cannot load module &quot; + module + &quot; (resolved as: &quot; + canonicalPath + &quot;).&quot;);
+        } 
+        else {
+          //store the loaded module so we don&#x27;t need to load it again.
+          modules[canonicalPath] = moduleObject;
+        }
+      }      
+    }
+    
+    //either the module was already loaded, or we just loaded it anew.
+    return moduleObject;
+  }
+  
+  function plainLoad(module){
+    return getModule(module, true);
+  }
+
+  /**
+  * Defines a module. 
+  *
+  * The &#x60;define()&#x60; function is available globally. 
+  * It allows you to cleanly define and expose functionality using the javascript module pattern.
+  
+  * The last argument passed to &#x60;define()&#x60; should be a callback function that actually defines the module.
+  * Typically the callback returns a value (usually of the object or function type) that provides access to the functionality of the module.
+  * For example, a module could expose a constructor, or a factory function.
+  * Alternatively, a module could return a singleton object or a constant value.
+  * Finally, the callback could also expose its own global properties and/or functions.
+  *
+  * &#x60;define()&#x60; lets you load and manage any dependencies your module might have.
+  * Any dependencies can be passed as string arguments prior to the final callback argument.
+  *
+  * Dependency argument are considered paths to javascript files that themselves typically define other modules.
+  * Relative paths are resolved against the location of the current module.
+  *
+  * Dependencies loaded with &#x60;define()&#x60; are loaded only once.
+  * Subsequent requests for a module loaded prior are served from a module cache.
+  *
+  * Example module in file module3.js
+  *
+  *     (function(){
+  *
+  *       //use the define() method to define module1 and module2 as dependencies
+  *       //and to create and expose a new module 
+  *       define(
+  *         &quot;tmp/module1.js&quot;, &quot;../scripts/module2.js&quot;,  //dependencies
+  *         function(module1, module2){                 //callback creates the actual module.
+  *           //this callback is called after module1 and module2 are loaded
+  *           //the callback is passed those dependencies as arguments so it can use them.
+  *           return {
+  *             ...define the actual module functionlity here...
+  *           };
+  *         }
+  *       );
+  *     })()  //in this example, &quot;this&quot; passed to the module is thought to be the Global object.
+  *
+  * 
+  *
+  * @method define
+  * @param [...dependency] {string} Modules upon which this module is dependent.
+  * @param module The module being defined. This should typically be a function, but it may also be a object, or a string identifying a script. 
+  * @return {Object}
+  */
+  function define(){
+    var i, n = arguments.length - 1, dependency, dependencyModule, dependencyModules = [];
+    for (i = 0; i &lt; n; i++) {
+      dependency = arguments[i];
+      dependencyModule = getModule(dependency);
+      dependencyModules.push(dependencyModule);
+    }
+    
+    var callback = arguments[n], typeOfCallback = typeof(callback), ret;
+    switch (typeOfCallback) {
+      case &quot;string&quot;:
+        var plainLoad = (n === 1);
+        dependencyModule = getModule(callback, plainLoad);
+        break;
+      case &quot;function&quot;:
+        dependencyModule = callback.apply(this, dependencyModules);
+        break;
+      case &quot;object&quot;:
+        dependencyModule = callback;
+        break;
+      default:
+        throw new Error(&quot;Last argument to define() must be either a path to load a module, or a function that returns the public interface to a module. Found: &quot; + typeOfCallback);
+        break;
+    }
+    
+    return dependencyModule;
+  }
+  
+  //make define() accesible in the global object
+  exports.define = define;
+  
+  //override the built-in load
+  //exports.load = plainLoad;
+  
+  var mainModule = getSystemProperty(&quot;jjsml.main.module&quot;);
+  if (mainModule === null || typeof(mainModule) === &quot;undefined&quot;) {
+    throw new Error(&quot;Cannot load main module: System property jjsml.main.module is undefined. Pass the main module script as -Djjsml.main.module=&lt;your main module script&gt;&quot;);
+  }
+  
+  //split the module in script and path
+  var dir = splitPath(mainModule);
+  var script = dir.pop();
+  
+  //obtain a file representing the module to load
+  var file = new File(dir.join(separator), script);
+  var isAbsolute = file.isAbsolute();
+  if (!isAbsolute) {
+    //relative: prepend the program working directory
+    var pwd = $ENV.PWD;
+    pwd = splitPath(pwd);
+    dir = pwd.concat(dir);
+  }
+  //establis initial current working directoruy
+  cwd.push(dir);
+  
+  //load the main module.
+  var module = getModule(script);
+  if (typeof(module) === &quot;function&quot;) {
+    module();
+  }
+  
+})(this);
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
